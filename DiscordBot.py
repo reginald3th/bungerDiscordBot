@@ -37,7 +37,7 @@ async def ily(interaction: discord.Interaction):
 
 # Minecraft server control
 MINECRAFT_DIR = "/home/sputnik/minecraft-server"
-MINECRAFT_START_CMD = "java -Xmx6G -jar server.jar nogui"
+MINECRAFT_START_CMD = "java -jar minecraft_server.jar -Xmx6024M -Xms1024M nogui"
 MINECRAFT_SESSION = "minecraft"
 
 @tree.command(name="startmc", description="Start the Minecraft Server (currently running CABIN)")
