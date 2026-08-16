@@ -43,9 +43,6 @@ MINECRAFT_SESSION = "minecraft"
 @tree.command(name="startmc", description="Start the Minecraft Server (currently running CABIN)")
 async def startmc(interaction: discord.Interaction):
     await interaction.response.defer()
-
-async def startmc(interaction: discord.Interaction):
-    await interaction.response.defer()
  
     # Check if a tmux session with this name already exists
     check = await asyncio.create_subprocess_exec(
