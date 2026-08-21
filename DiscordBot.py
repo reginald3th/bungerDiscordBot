@@ -87,7 +87,7 @@ async def server_info(interaction: discord.Interaction):
     await check.wait()
  
     if check.returncode != 0:
-        await interaction.followup.send("🔴 Minecraft server is offline. Use `/startmc` to start it.")
+        await interaction.followup.send("Server Offline.")
         return
  
     try:
@@ -103,7 +103,7 @@ async def server_info(interaction: discord.Interaction):
             who = "nobody right now"
  
         message = (
-            f"🟢 **Server Online**\n"
+            f" **Server Online**\n"
             f"Players: {status.players.online}/{status.players.max} ({who})\n"
             f"Version: {status.version.name}\n"
             f"Ping: {round(status.latency)}ms"
