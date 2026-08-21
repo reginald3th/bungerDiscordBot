@@ -2,6 +2,7 @@ import os
 import discord
 from discord import app_commands
 import asyncio
+from mcstatus import JavaServer
 
 token = os.environ.get("DISCORD_TOKEN")
 if not token:
@@ -70,6 +71,55 @@ async def startmc(interaction: discord.Interaction):
         await interaction.followup.send("Failed to start the tmux session. Check the server logs. <:geekbar:1538647146872574115>: Help !!!")
 
  
+
+MINECRAFT_HOST = "localhost"
+MINECRAFT_PORT = 25565
+
+async def server_info(interaction: discord.Interaction):
+    await interaction.response.defer()
+ 
+    # First check if it's even running at all via tmux
+    check = await asyncio.create_subprocess_exec(
+        "tmux", "has-session", "-t", MINECRAFT_SESSION,
+        stdout=asyncio.subprocess.DEVNULL,
+        stderr=asyncio.subprocess.DEVNULL
+    )
+    await check.wait()
+ 
+    if check.returncode != 0:
+        await interaction.followup.send("🔴 Minecraft server is offline. Use `/startmc` to start it.")
+        return
+ 
+    try:
+        mc_server = JavaServer.lookup(f"{MINECRAFT_HOST}:{MINECRAFT_PORT}")
+        # mcstatus's status() call is blocking (not async-native), so we run it
+        # in a separate thread with asyncio.to_thread - this stops it from
+        # freezing the whole bot while it waits on the network request.
+        status = await asyncio.to_thread(mc_server.status)
+ 
+        if status.players.sample:
+            who = ", ".join(p.name for p in status.players.sample)
+        else:
+            who = "nobody right now"
+ 
+        message = (
+            f"🟢 **Server Online**\n"
+            f"Players: {status.players.online}/{status.players.max} ({who})\n"
+            f"Version: {status.version.name}\n"
+            f"Ping: {round(status.latency)}ms"
+        )
+        await interaction.followup.send(message)
+ 
+    except Exception as e:
+        await interaction.followup.send(
+            f"⚠️ Server process is running, but I couldn't get status from it "
+            f"(maybe it's still starting up). Error: {e}"
+        )
+ 
+ 
+
+    
+
 @client.event
 async def on_message(message):
     if message.author == client.user:
