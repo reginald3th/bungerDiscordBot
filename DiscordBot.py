@@ -75,6 +75,7 @@ async def startmc(interaction: discord.Interaction):
 MINECRAFT_HOST = "localhost"
 MINECRAFT_PORT = 25565
 
+@tree.command(name="server", description="shows information about the ser (currently running CABIN)")
 async def server_info(interaction: discord.Interaction):
     await interaction.response.defer()
  
